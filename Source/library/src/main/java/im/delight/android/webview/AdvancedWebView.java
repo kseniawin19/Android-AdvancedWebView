@@ -1,6 +1,6 @@
 package im.delight.android.webview;
 
-/*
+/* v3
  * Android-AdvancedWebView (https://github.com/delight-im/Android-AdvancedWebView)
  * Copyright (c) delight.im (https://www.delight.im/)
  * Licensed under the MIT License (https://opensource.org/licenses/MIT)
@@ -94,17 +94,17 @@ public class AdvancedWebView extends WebView {
 	protected String mUploadableFileTypes = "*/*";
 	protected final Map<String, String> mHttpHeaders = new HashMap<String, String>();
 
-	public AdvancedWebView(Context context) {
+	public MyAdvancedWebView(Context context) {
 		super(context);
 		init(context);
 	}
 
-	public AdvancedWebView(Context context, AttributeSet attrs) {
+	public MyAdvancedWebView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(context);
 	}
 
-	public AdvancedWebView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public MyAdvancedWebView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		init(context);
 	}
@@ -460,6 +460,8 @@ public class AdvancedWebView extends WebView {
 
 		setThirdPartyCookiesEnabled(true);
 
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
 		super.setWebViewClient(new WebViewClient() {
 
 			@Override
@@ -501,227 +503,80 @@ public class AdvancedWebView extends WebView {
 				}
 			}
 
-			@Override
-			public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-				if (!isPermittedUrl(url)) {
-					// if a listener is available
-					if (mListener != null) {
-						// inform the listener about the request
-						mListener.onExternalPageRequest(url);
-					}
-
-					// cancel the original request
-					return true;
-				}
-
-				// if there is a user-specified handler available
-				if (mCustomWebViewClient != null) {
-					// if the user-specified handler asks to override the request
-					if (mCustomWebViewClient.shouldOverrideUrlLoading(view, url)) {
-						// cancel the original request
-						return true;
-					}
-				}
-
-				final Uri uri = Uri.parse(url);
-				final String scheme = uri.getScheme();
-
-				if (scheme != null) {
-					final Intent externalSchemeIntent;
-
-					if (scheme.equals("tel")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_DIAL, uri);
-					}
-					else if (scheme.equals("sms")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-					}
-					else if (scheme.equals("mailto")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-					}
-					else if (scheme.equals("whatsapp")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-						externalSchemeIntent.setPackage("com.whatsapp");
-					}
-					else {
-						externalSchemeIntent = null;
-					}
-
-					if (externalSchemeIntent != null) {
-						externalSchemeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-						try {
-							if (mActivity != null && mActivity.get() != null) {
-								mActivity.get().startActivity(externalSchemeIntent);
-							}
-							else {
-								getContext().startActivity(externalSchemeIntent);
-							}
-						}
-						catch (ActivityNotFoundException ignored) {}
-
-						// cancel the original request
-						return true;
-					}
-				}
-
-				// route the request through the custom URL loading method
-				view.loadUrl(url);
-
-				// cancel the original request
-				return true;
-			}
-
-			@Override
-			public void onLoadResource(WebView view, String url) {
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.onLoadResource(view, url);
-				}
-				else {
-					super.onLoadResource(view, url);
-				}
-			}
-
-			@SuppressLint("NewApi")
-			@SuppressWarnings("all")
-			public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-				if (Build.VERSION.SDK_INT >= 11) {
-					if (mCustomWebViewClient != null) {
-						return mCustomWebViewClient.shouldInterceptRequest(view, url);
-					}
-					else {
-						return super.shouldInterceptRequest(view, url);
-					}
-				}
-				else {
-					return null;
-				}
-			}
-
-			@SuppressLint("NewApi")
-			@SuppressWarnings("all")
-			public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-				if (Build.VERSION.SDK_INT >= 21) {
-					if (mCustomWebViewClient != null) {
-						return mCustomWebViewClient.shouldInterceptRequest(view, request);
-					}
-					else {
-						return super.shouldInterceptRequest(view, request);
-					}
-				}
-				else {
-					return null;
-				}
-			}
-
-			@Override
-			public void onFormResubmission(WebView view, Message dontResend, Message resend) {
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.onFormResubmission(view, dontResend, resend);
-				}
-				else {
-					super.onFormResubmission(view, dontResend, resend);
-				}
-			}
-
-			@Override
-			public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.doUpdateVisitedHistory(view, url, isReload);
-				}
-				else {
-					super.doUpdateVisitedHistory(view, url, isReload);
-				}
-			}
-
-			@Override
-			public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.onReceivedSslError(view, handler, error);
-				}
-				else {
-					super.onReceivedSslError(view, handler, error);
-				}
-			}
-
-			@SuppressLint("NewApi")
-			@SuppressWarnings("all")
-			public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
-				if (Build.VERSION.SDK_INT >= 21) {
-					if (mCustomWebViewClient != null) {
-						mCustomWebViewClient.onReceivedClientCertRequest(view, request);
-					}
-					else {
-						super.onReceivedClientCertRequest(view, request);
-					}
-				}
-			}
-
-			@Override
-			public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.onReceivedHttpAuthRequest(view, handler, host, realm);
-				}
-				else {
-					super.onReceivedHttpAuthRequest(view, handler, host, realm);
-				}
-			}
-
-			@Override
-			public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event) {
-				if (mCustomWebViewClient != null) {
-					return mCustomWebViewClient.shouldOverrideKeyEvent(view, event);
-				}
-				else {
-					return super.shouldOverrideKeyEvent(view, event);
-				}
-			}
-
-			@Override
-			public void onUnhandledKeyEvent(WebView view, KeyEvent event) {
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.onUnhandledKeyEvent(view, event);
-				}
-				else {
-					super.onUnhandledKeyEvent(view, event);
-				}
-			}
-
-			@SuppressLint("NewApi")
-			@SuppressWarnings("all")
-			public void onUnhandledInputEvent(WebView view, InputEvent event) {
-				if (Build.VERSION.SDK_INT >= 21) {
-					if (mCustomWebViewClient != null) {
-						mCustomWebViewClient.onUnhandledInputEvent(view, event);
-					}
-					else {
-						super.onUnhandledInputEvent(view, event);
-					}
-				}
-			}
-
-			@Override
-			public void onScaleChanged(WebView view, float oldScale, float newScale) {
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.onScaleChanged(view, oldScale, newScale);
-				}
-				else {
-					super.onScaleChanged(view, oldScale, newScale);
-				}
-			}
-
-			@SuppressLint("NewApi")
-			@SuppressWarnings("all")
-			public void onReceivedLoginRequest(WebView view, String realm, String account, String args) {
-				if (Build.VERSION.SDK_INT >= 12) {
-					if (mCustomWebViewClient != null) {
-						mCustomWebViewClient.onReceivedLoginRequest(view, realm, account, args);
-					}
-					else {
-						super.onReceivedLoginRequest(view, realm, account, args);
-					}
-				}
-			}
-
+//			@Override
+//			public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+//				if (!isPermittedUrl(url)) {
+//					// if a listener is available
+//					if (mListener != null) {
+//						// inform the listener about the request
+//						mListener.onExternalPageRequest(url);
+//					}
+//
+//					// cancel the original request
+//					return true;
+//				}
+//
+//				// if there is a user-specified handler available
+//				if (mCustomWebViewClient != null) {
+//					// if the user-specified handler asks to override the request
+//					if (mCustomWebViewClient.shouldOverrideUrlLoading(view, url)) {
+//						// cancel the original request
+//						return true;
+//					}
+//				}
+//
+//				final Uri uri = Uri.parse(url);
+//				final String scheme = uri.getScheme();
+//
+//				if (scheme != null) {
+//					final Intent externalSchemeIntent;
+//
+//					if (scheme.equals("tel")) {
+//						externalSchemeIntent = new Intent(Intent.ACTION_DIAL, uri);
+//					}
+//					else if (scheme.equals("sms")) {
+//						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
+//					}
+//					else if (scheme.equals("mailto")) {
+//						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
+//					}
+//					else if (scheme.equals("whatsapp")) {
+//						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
+//						externalSchemeIntent.setPackage("com.whatsapp");
+//					}
+//					else {
+//						externalSchemeIntent = null;
+//					}
+//
+//					if (externalSchemeIntent != null) {
+//						externalSchemeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//
+//						try {
+//							if (mActivity != null && mActivity.get() != null) {
+//								mActivity.get().startActivity(externalSchemeIntent);
+//							}
+//							else {
+//								getContext().startActivity(externalSchemeIntent);
+//							}
+//						}
+//						catch (ActivityNotFoundException ignored) {}
+//
+//						// cancel the original request
+//						return true;
+//					}
+//				}
+//
+//				// route the request through the custom URL loading method
+//				view.loadUrl(url);
+//
+//				// cancel the original request
+//				return true;
+//			}
+//
+//			@Override
+//			public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+//			    handler.proceed();
+//			}
 		});
 
 		super.setWebChromeClient(new WebChromeClient() {
@@ -757,281 +612,6 @@ public class AdvancedWebView extends WebView {
 					return false;
 				}
 			}
-
-// 			@Override
-// 			public void onProgressChanged(WebView view, int newProgress) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onProgressChanged(view, newProgress);
-// 				}
-// 				else {
-// 					super.onProgressChanged(view, newProgress);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onReceivedTitle(WebView view, String title) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onReceivedTitle(view, title);
-// 				}
-// 				else {
-// 					super.onReceivedTitle(view, title);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onReceivedIcon(WebView view, Bitmap icon) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onReceivedIcon(view, icon);
-// 				}
-// 				else {
-// 					super.onReceivedIcon(view, icon);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onReceivedTouchIconUrl(WebView view, String url, boolean precomposed) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onReceivedTouchIconUrl(view, url, precomposed);
-// 				}
-// 				else {
-// 					super.onReceivedTouchIconUrl(view, url, precomposed);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onShowCustomView(View view, CustomViewCallback callback) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onShowCustomView(view, callback);
-// 				}
-// 				else {
-// 					super.onShowCustomView(view, callback);
-// 				}
-// 			}
-
-// 			@SuppressLint("NewApi")
-// 			@SuppressWarnings("all")
-// 			public void onShowCustomView(View view, int requestedOrientation, CustomViewCallback callback) {
-// 				if (Build.VERSION.SDK_INT >= 14) {
-// 					if (mCustomWebChromeClient != null) {
-// 						mCustomWebChromeClient.onShowCustomView(view, requestedOrientation, callback);
-// 					}
-// 					else {
-// 						super.onShowCustomView(view, requestedOrientation, callback);
-// 					}
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onHideCustomView() {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onHideCustomView();
-// 				}
-// 				else {
-// 					super.onHideCustomView();
-// 				}
-// 			}
-
-// 			@Override
-// 			public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
-// 				}
-// 				else {
-// 					return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onRequestFocus(WebView view) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onRequestFocus(view);
-// 				}
-// 				else {
-// 					super.onRequestFocus(view);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onCloseWindow(WebView window) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onCloseWindow(window);
-// 				}
-// 				else {
-// 					super.onCloseWindow(window);
-// 				}
-// 			}
-
-// 			@Override
-// 			public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.onJsAlert(view, url, message, result);
-// 				}
-// 				else {
-// 					return super.onJsAlert(view, url, message, result);
-// 				}
-// 			}
-
-// 			@Override
-// 			public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.onJsConfirm(view, url, message, result);
-// 				}
-// 				else {
-// 					return super.onJsConfirm(view, url, message, result);
-// 				}
-// 			}
-
-// 			@Override
-// 			public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.onJsPrompt(view, url, message, defaultValue, result);
-// 				}
-// 				else {
-// 					return super.onJsPrompt(view, url, message, defaultValue, result);
-// 				}
-// 			}
-
-// 			@Override
-// 			public boolean onJsBeforeUnload(WebView view, String url, String message, JsResult result) {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.onJsBeforeUnload(view, url, message, result);
-// 				}
-// 				else {
-// 					return super.onJsBeforeUnload(view, url, message, result);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onGeolocationPermissionsShowPrompt(String origin, Callback callback) {
-// 				if (mGeolocationEnabled) {
-// 					callback.invoke(origin, true, false);
-// 				}
-// 				else {
-// 					if (mCustomWebChromeClient != null) {
-// 						mCustomWebChromeClient.onGeolocationPermissionsShowPrompt(origin, callback);
-// 					}
-// 					else {
-// 						super.onGeolocationPermissionsShowPrompt(origin, callback);
-// 					}
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onGeolocationPermissionsHidePrompt() {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onGeolocationPermissionsHidePrompt();
-// 				}
-// 				else {
-// 					super.onGeolocationPermissionsHidePrompt();
-// 				}
-// 			}
-
-// 			@SuppressLint("NewApi")
-// 			@SuppressWarnings("all")
-// 			public void onPermissionRequest(PermissionRequest request) {
-// 				if (Build.VERSION.SDK_INT >= 21) {
-// 					if (mCustomWebChromeClient != null) {
-// 						mCustomWebChromeClient.onPermissionRequest(request);
-// 					}
-// 					else {
-// 						super.onPermissionRequest(request);
-// 					}
-// 				}
-// 			}
-
-// 			@SuppressLint("NewApi")
-// 			@SuppressWarnings("all")
-// 			public void onPermissionRequestCanceled(PermissionRequest request) {
-// 				if (Build.VERSION.SDK_INT >= 21) {
-// 					if (mCustomWebChromeClient != null) {
-// 						mCustomWebChromeClient.onPermissionRequestCanceled(request);
-// 					}
-// 					else {
-// 						super.onPermissionRequestCanceled(request);
-// 					}
-// 				}
-// 			}
-
-// 			@Override
-// 			public boolean onJsTimeout() {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.onJsTimeout();
-// 				}
-// 				else {
-// 					return super.onJsTimeout();
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onConsoleMessage(String message, int lineNumber, String sourceID) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onConsoleMessage(message, lineNumber, sourceID);
-// 				}
-// 				else {
-// 					super.onConsoleMessage(message, lineNumber, sourceID);
-// 				}
-// 			}
-
-// 			@Override
-// 			public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.onConsoleMessage(consoleMessage);
-// 				}
-// 				else {
-// 					return super.onConsoleMessage(consoleMessage);
-// 				}
-// 			}
-
-// 			@Override
-// 			public Bitmap getDefaultVideoPoster() {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.getDefaultVideoPoster();
-// 				}
-// 				else {
-// 					return super.getDefaultVideoPoster();
-// 				}
-// 			}
-
-// 			@Override
-// 			public View getVideoLoadingProgressView() {
-// 				if (mCustomWebChromeClient != null) {
-// 					return mCustomWebChromeClient.getVideoLoadingProgressView();
-// 				}
-// 				else {
-// 					return super.getVideoLoadingProgressView();
-// 				}
-// 			}
-
-// 			@Override
-// 			public void getVisitedHistory(ValueCallback<String[]> callback) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.getVisitedHistory(callback);
-// 				}
-// 				else {
-// 					super.getVisitedHistory(callback);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onExceededDatabaseQuota(String url, String databaseIdentifier, long quota, long estimatedDatabaseSize, long totalQuota, QuotaUpdater quotaUpdater) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onExceededDatabaseQuota(url, databaseIdentifier, quota, estimatedDatabaseSize, totalQuota, quotaUpdater);
-// 				}
-// 				else {
-// 					super.onExceededDatabaseQuota(url, databaseIdentifier, quota, estimatedDatabaseSize, totalQuota, quotaUpdater);
-// 				}
-// 			}
-
-// 			@Override
-// 			public void onReachedMaxAppCacheSize(long requiredStorage, long quota, QuotaUpdater quotaUpdater) {
-// 				if (mCustomWebChromeClient != null) {
-// 					mCustomWebChromeClient.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-// 				}
-// 				else {
-// 					super.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-// 				}
-// 			}
-
 		});
 
 		setDownloadListener(new DownloadListener() {
@@ -1321,7 +901,7 @@ public class AdvancedWebView extends WebView {
 		// if the download manager app has been disabled on the device
 		catch (IllegalArgumentException e) {
 			// show the settings screen where the user can enable the download manager app again
-			openAppSettings(context, AdvancedWebView.PACKAGE_NAME_DOWNLOAD_MANAGER);
+			openAppSettings(context, MyAdvancedWebView.PACKAGE_NAME_DOWNLOAD_MANAGER);
 
 			return false;
 		}
