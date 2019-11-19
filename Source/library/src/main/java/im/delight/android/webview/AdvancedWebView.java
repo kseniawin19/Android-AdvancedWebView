@@ -94,17 +94,17 @@ public class AdvancedWebView extends WebView {
 	protected String mUploadableFileTypes = "*/*";
 	protected final Map<String, String> mHttpHeaders = new HashMap<String, String>();
 
-	public MyAdvancedWebView(Context context) {
+	public AdvancedWebView(Context context) {
 		super(context);
 		init(context);
 	}
 
-	public MyAdvancedWebView(Context context, AttributeSet attrs) {
+	public AdvancedWebView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(context);
 	}
 
-	public MyAdvancedWebView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public AdvancedWebView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		init(context);
 	}
@@ -866,7 +866,8 @@ public class AdvancedWebView extends WebView {
 	 * Only supported on API level 9 (Android 2.3) and above
 	 *
 	 * @param context a valid `Context` reference
-	 * @param fromUrl the URL of the file to download, e.g. the one from `AdvancedWebView.onDownloadRequested(...)`
+	 * @param fromUrl the URL of the file to download, e.g. the one from `
+	 .onDownloadRequested(...)`
 	 * @param toFilename the name of the destination file where the download should be saved, e.g. `myImage.jpg`
 	 * @return whether the download has been successfully handled or not
 	 * @throws IllegalStateException if the storage or the target directory could not be found or accessed
@@ -901,7 +902,7 @@ public class AdvancedWebView extends WebView {
 		// if the download manager app has been disabled on the device
 		catch (IllegalArgumentException e) {
 			// show the settings screen where the user can enable the download manager app again
-			openAppSettings(context, MyAdvancedWebView.PACKAGE_NAME_DOWNLOAD_MANAGER);
+			openAppSettings(context, AdvancedWebView.PACKAGE_NAME_DOWNLOAD_MANAGER);
 
 			return false;
 		}
