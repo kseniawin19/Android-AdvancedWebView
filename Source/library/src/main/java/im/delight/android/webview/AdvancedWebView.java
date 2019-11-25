@@ -1,6 +1,6 @@
 package im.delight.android.webview;
 
-/* v3
+/* v4
  * Android-AdvancedWebView (https://github.com/delight-im/Android-AdvancedWebView)
  * Copyright (c) delight.im (https://www.delight.im/)
  * Licensed under the MIT License (https://opensource.org/licenses/MIT)
