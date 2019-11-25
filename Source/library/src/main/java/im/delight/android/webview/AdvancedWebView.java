@@ -488,7 +488,7 @@ public class AdvancedWebView extends WebView {
 				if (mCustomWebViewClient != null) {
 					mCustomWebViewClient.onPageFinished(view, url);
 				}
-				CookieManager.getInstance().flush()
+				CookieManager.getInstance().flush();
 			}
 
 			@Override
