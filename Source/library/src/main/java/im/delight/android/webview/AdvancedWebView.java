@@ -50,9 +50,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.webkit.WebView;
-
-import androidx.annotation.RequiresApi;
-
 import java.util.MissingResourceException;
 import java.util.Locale;
 import java.util.LinkedList;
@@ -495,7 +492,6 @@ public class AdvancedWebView extends WebView {
 				CookieManager.getInstance().flush();
 			}
 
-            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 super.onReceivedError(view, request, error);
