@@ -45,7 +45,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings;
-import android.webkit.*
+import android.webkit.*;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
