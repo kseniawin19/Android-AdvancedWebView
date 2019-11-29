@@ -23,6 +23,7 @@ import android.webkit.ClientCertRequest;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
 import android.webkit.URLUtil;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.os.Message;
@@ -45,11 +46,13 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings;
-import android.webkit.*;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.webkit.WebView;
+
+import androidx.annotation.RequiresApi;
+
 import java.util.MissingResourceException;
 import java.util.Locale;
 import java.util.LinkedList;
@@ -492,7 +495,17 @@ public class AdvancedWebView extends WebView {
 				CookieManager.getInstance().flush();
 			}
 
-			@Override
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+
+                if (mCustomWebViewClient != null) {
+                    mCustomWebViewClient.onReceivedError(view, request, error);
+                }
+            }
+
+            @Override
 			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
 				setLastError();
 
@@ -502,15 +515,6 @@ public class AdvancedWebView extends WebView {
 
 				if (mCustomWebViewClient != null) {
 					mCustomWebViewClient.onReceivedError(view, errorCode, description, failingUrl);
-				}
-			}
-			
-			@Override
-			public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-				setLastError();
-
-				if (mCustomWebViewClient != null) {
-					mCustomWebViewClient.onReceivedError(view, request, error);
 				}
 			}
 
@@ -877,8 +881,7 @@ public class AdvancedWebView extends WebView {
 	 * Only supported on API level 9 (Android 2.3) and above
 	 *
 	 * @param context a valid `Context` reference
-	 * @param fromUrl the URL of the file to download, e.g. the one from `
-	 .onDownloadRequested(...)`
+	 * @param fromUrl the URL of the file to download, e.g. the one from `AdvancedWebView.onDownloadRequested(...)`
 	 * @param toFilename the name of the destination file where the download should be saved, e.g. `myImage.jpg`
 	 * @return whether the download has been successfully handled or not
 	 * @throws IllegalStateException if the storage or the target directory could not be found or accessed
