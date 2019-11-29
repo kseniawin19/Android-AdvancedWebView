@@ -1,6 +1,6 @@
 package im.delight.android.webview;
 
-/* v4 (cookie)
+/* v5 (onPageFinished)
  * Android-AdvancedWebView (https://github.com/delight-im/Android-AdvancedWebView)
  * Copyright (c) delight.im (https://www.delight.im/)
  * Licensed under the MIT License (https://opensource.org/licenses/MIT)
@@ -501,6 +501,15 @@ public class AdvancedWebView extends WebView {
 
 				if (mCustomWebViewClient != null) {
 					mCustomWebViewClient.onReceivedError(view, errorCode, description, failingUrl);
+				}
+			}
+			
+			@Override
+			public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+				setLastError();
+
+				if (mCustomWebViewClient != null) {
+					mCustomWebViewClient.onReceivedError(view, request, error);
 				}
 			}
 
